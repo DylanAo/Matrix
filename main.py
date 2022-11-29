@@ -1,5 +1,6 @@
 from matrix import Matrix
 
+# 这里是简单的测试集
 a = Matrix(3, 2, [9, 2, 3, 21, 5, 6])
 b = Matrix(2, 4, [1, 2, 10, 4, 23, 6, 15, 8])
 c = Matrix(3, 2, [18, 19, 23, 1, 3, 51])
@@ -19,6 +20,3 @@ print('a * b =')
 a.multiply(a, b, True)
 print('2 * a = ')
 a.number_multiply(2, True)
-
-
-
