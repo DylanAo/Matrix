@@ -151,3 +151,75 @@ class  Matrix():
         self.line, self.row = self.row, self.line
         if isPrint:
             self.print_matrix()
+
+    def value(self, isPrint = False):
+        '''
+        行列式的值
+        :param isPrint: True 为打印结果 默认为False
+        :return: 行列式的值
+        '''
+        if self.row != self.line:
+            print("不是方阵无法运算！")
+            return 0
+        # 当我写完之后我才想起来，原来对角线法不能用于2*2行列式
+        # 2*2
+        if self.row == 2:
+            ans = self.data[0] * self.data[3] - self.data[1] * self.data[2]
+            if isPrint:  # 我知道这里写的很蠢，但是下面我实在不想动了，就当是屎山得了
+                print(ans)
+            return ans  # 能跑就行，我加2*2后第一遍写完发现报错了，吓死了，还好只是缩进错了（就是这里）
+        # !2*2(这个感叹号是不是很妙啊，哈哈哈哈）
+        # 这里其实用的是对角线法,现在是加数值
+        ans = 0
+        for k in range(0, self.row):
+            ans_middle = 1
+            for i, j in zip(range(0, self.row), range(k, self.line + k)):
+                ans_middle *= self.data[i * self.row + j % self.line]
+            ans += ans_middle
+        # 现在是减数值
+        for k in range(0, self.row):
+            ans_middle = 1
+            for i, j in zip(range(0, self.row), range(k, self.line + k)):
+                ans_middle *= self.data[i * self.row + (3 - j) % self.line]
+            ans -= ans_middle
+            # 上面要是看不懂，自己画个3*3行列式找个规律就行了
+        if isPrint:
+            print(ans)
+        return ans  # 矩阵的逆第一步我算是写完了
+
+    def ivn(self, isPrint = False):
+        '''
+        矩阵的逆
+        :param isPrint: True 为打印结果 默认为False
+        '''
+        if self.row != self.line:
+            print("不是方阵无法运算！")
+            return 0
+        # 这里先进行一些代数余子式的运算
+        # 每个代数余子式可以看成是n - 1 * n - 1的行列式计算，关键在于怎么把行和列剔除呢
+        matrix_middle = Matrix(self.row - 1, self.line - 1, [0])
+        matrix_middle_data = []
+        data = []
+        value = self.value()
+        for k in range(self.line):
+            for p in range(self.row):
+                # 以上是控制 n * n 矩阵的
+                # 以下是控制 n - 1 * n - 1 矩阵的（代数余子式）
+                matrix_middle_data.clear()
+                for i in range(self.line):
+                    for j in range(self.row):
+                        if i != k and j != p:
+                            matrix_middle_data.append(self.data[i * self.row + j])
+                matrix_middle.data = matrix_middle_data
+                # 现在我余子式那个行列式构建完成，下面我开始计算,并把他放到新的列表里面
+                data.append(matrix_middle.value() * -1 ** (k + p))
+        # 此时，我有关代数余子式计算已经完成力(喜)
+        self.data = data
+        self.transpose()
+        data_middle = []
+        for i in range(self.line):
+            for j in range(self.row):
+                data_middle.append(self.data[i * self.row + j] / value)
+        self.data = data_middle
+        if isPrint:
+            self.print_matrix()
